@@ -15,13 +15,17 @@ object Solution:
   case class SafeHistory(currentPosition: Int, zeroesStops: Int = 0, zeroesPassedThrough: Int = 0):
     def next(move: Move): SafeHistory =
       val rawPosition = move.next(currentPosition)
-      val zeroes = Math.floorDiv(rawPosition - currentPosition, 100).abs
-      val signChange = if zeroes == 0 && (currentPosition.sign - rawPosition.sign).abs == 2 && rawPosition != 0 then 1 else 0
-      val finalPosition = rawPosition % 100
+      val zeroes = Math.floorDiv(move.steps, 100)
+      val finalPosition = ((rawPosition % 100) + 100) % 100)
+      val correctedZeroes =
+move match
+   case Left(_) if finalPosition > currentPosition => 1
+   case Right(_) if finalPosition < currentPosition => 1
+   case _ => 0
       if finalPosition == 0 then
-        this.copy(currentPosition = finalPosition, zeroesStops = zeroesStops + 1, zeroesPassedThrough = zeroesPassedThrough + zeroes + signChange)
+        this.copy(currentPosition = finalPosition, zeroesStops = zeroesStops + 1, zeroesPassedThrough = zeroesPassedThrough + zeroes + correctedZeroes)
       else
-        this.copy(currentPosition = finalPosition, zeroesPassedThrough = zeroesPassedThrough + zeroes)
+        this.copy(currentPosition = finalPosition, zeroesPassedThrough = zeroesPassedThrough + zeroes + correctedZeroes)
 
 
   sealed trait Move:
