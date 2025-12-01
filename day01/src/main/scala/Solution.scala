@@ -3,29 +3,27 @@ object Solution:
 
     val firstPositionOfSafe = 50
 
-    val safeHistory = inputLines.iterator.foldLeft(SafeHistory(firstPositionOfSafe)):
+    val (result1, result2) = inputLines.iterator.foldLeft(SafeHistory(firstPositionOfSafe)):
       case (sh, MoveExtractor(move)) => sh.next(move)
-
-
-    val result1 = s"${safeHistory.zeroesStops}"
-    val result2 = s"${safeHistory.zeroesPassedThrough}"
+    .stats
 
     (result1.toString, result2.toString)
 
   case class SafeHistory(currentPosition: Int, zeroesStops: Int = 0, zeroesPassedThrough: Int = 0):
+    lazy val stats: (Int, Int) = (zeroesStops, zeroesPassedThrough)
     def next(move: Move): SafeHistory =
       val rawPosition = move.next(currentPosition)
-      val zeroes = Math.floorDiv(move.steps, 100)
-      val finalPosition = ((rawPosition % 100) + 100) % 100)
+      val finalPosition = ((rawPosition % 100) + 100) % 100
       val correctedZeroes =
-move match
-   case Left(_) if finalPosition > currentPosition => 1
-   case Right(_) if finalPosition < currentPosition => 1
-   case _ => 0
+        (move match
+           case Left(_) if finalPosition > currentPosition => 1
+           case Right(_) if finalPosition < currentPosition => 1
+           case _ => 0
+          ) + Math.floorDiv(move.steps, 100)
       if finalPosition == 0 then
-        this.copy(currentPosition = finalPosition, zeroesStops = zeroesStops + 1, zeroesPassedThrough = zeroesPassedThrough + zeroes + correctedZeroes)
+        this.copy(currentPosition = finalPosition, zeroesStops = zeroesStops + 1, zeroesPassedThrough = zeroesPassedThrough + correctedZeroes)
       else
-        this.copy(currentPosition = finalPosition, zeroesPassedThrough = zeroesPassedThrough + zeroes + correctedZeroes)
+        this.copy(currentPosition = finalPosition, zeroesPassedThrough = zeroesPassedThrough + correctedZeroes)
 
 
   sealed trait Move:
