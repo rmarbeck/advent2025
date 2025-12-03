@@ -32,6 +32,8 @@ def findFirstDigit(bank: List[Int], best: Int, index: Int, bestIndex: Int): (Int
     case head :: tail if head > best => findFirstDigit(tail, head, index + 1, index)
     case head :: tail => findFirstDigit(tail, best, index + 1, bestIndex)
 
+extension (tuple: (Long, Long))
+  def +(other: (Long, Long)): (Long, Long) = (tuple._1 + other._1, tuple._2 + other._2)
 
 
 
