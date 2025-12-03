@@ -4,18 +4,24 @@ object Solution:
   def run(inputLines: Seq[String]): (String, String) =
 
 
-    val result1 = inputLines.map(findMax).sum
-
-    val result2 = s""
+    val (result1, result2) = inputLines.map(findMax).reduce(_ + _)
 
     (result1.toString, result2.toString)
 
 end Solution
 
-def findMax(bank: String): Int =
-  val (first, indexFirst) = findFirstDigit(bank.map(_.asDigit).dropRight(1).toList, 0, 0, 0)
-  val second = bank.drop(indexFirst + 1).map(_.asDigit).max
-  first * 10 + second
+def findMax(bank: String): (Long, Long) =
+   val asDigits = bank.map(_.asDigit).toList
+   (findMaxRec(asDigits, 2), findMaxRec(asDigits, 12))
+
+
+@tailrec
+def findMaxRec(bank: List[Int], remaining: Int = 2, found: Long = 0L): Int =
+  remaining match
+    case 0 => found 
+    case _ => 
+      val (first, indexFirst) = findFirstDigit(bank.dropRight(remaining - 1), 0, 0, 0)
+      findMaxRec(bank.drop(indexFirst + 1), remaining - 1, found * 10 + first)
 
 
 @tailrec
