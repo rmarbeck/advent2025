@@ -23,7 +23,7 @@ val around: Seq[(Int, Int)] = (for y <- range; x <- range yield (y, x)).filter(_
 @tailrec
 def pickPapersUp(papers: Papers, firstDiff: Option[Int] = None, acc: Int = 0): (Int, Int) =
   val papersAfterPickup = Array.tabulate(papers.length, papers(0).length):
-    case (y, x) => papers(y)(x) && ! isAvailableForCollect(y, x)(papers)
+    (y, x) => papers(y)(x) && ! isAvailableForCollect(y, x)(papers)
 
   val count = papers.map(_.count(_ == true)).sum
   val newCount = papersAfterPickup.map(_.count(_ == true)).sum
@@ -35,6 +35,5 @@ def pickPapersUp(papers: Papers, firstDiff: Option[Int] = None, acc: Int = 0): (
 
 
 def isAvailableForCollect(row: Int, col: Int)(papers: Papers): Boolean =
-  around.map:
-    case (diffY, diffX) => if papers.isDefinedAt(row + diffY) && papers(row+diffY).isDefinedAt(col + diffX) then papers(row+diffY)(col+diffX) else false
-  .count(_ == true) < MaxSurroundings
+  (around.count:
+    (diffY, diffX) => if papers.isDefinedAt(row + diffY) && papers(row+diffY).isDefinedAt(col + diffX) then papers(row+diffY)(col+diffX) else false) < MaxSurroundings
