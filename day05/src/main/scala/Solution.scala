@@ -20,7 +20,7 @@ end Solution
 case class LongRange(start: Long, end: Long):
   def contains(other: Long): Boolean = other >= start && other <= end
   def count: Long = end - start + 1
-  private def overlaps(otherRange: LongRange): Boolean = otherRange.contains(start) || otherRange.contains(end) || this.contains(otherRange.start)  || this.contains(otherRange.end)
+  private def overlaps(otherRange: LongRange): Boolean = start <= otherRange.end + 1 && otherRange.start <= end + 1
   private def mergeWith(otherRange: LongRange) = LongRange(Math.min(start, otherRange.start), Math.max(end, otherRange.end))
 
   def mergeIn(alreadyMerged: Seq[LongRange]): Seq[LongRange] =
