@@ -1,5 +1,7 @@
+import annotation.tailrec
+
 object Solution:
-  def run(inputLines: Seq[String]): (String, String) =
+   .def run(inputLines: Seq[String]): (String, String) =
 
     val junctionBoxes = inputLines.collect:
       case JunctionBoxExt(jb) => jb
@@ -15,19 +17,22 @@ object Solution:
 
 end Solution
 
-def part1(jbDistances: List[(JunctionBox, JunctionBox)], remaining: Int, circuits: Seq[Seq[JunctionBox]] = Seq.empty[Seq[JunctionBox]]): Int =
+@tailrec
+def part1(jbDistances: List[(JunctionBox, JunctionBox)], remaining: Int, circuits: Seq[Set[JunctionBox]] = Seq.empty[Set[JunctionBox]]): Int =
   if remaining == 0 then
-    circuits.map(_.length).product
+    circuits.map(_.size).product
   else
     val current = jbDistances.head
     val (withCurrentJunction, withoutCurrentJunction)  = circuits.partition(circuit => circuit.contains(current._1) || circuit.contains(current._2))
     if withCurrentJunction.isEmpty then
-      part1(jbDistances.tail, remaining - 1, withoutCurrentJunction)
+      part1(jbDistances.tail, remaining - 1, Set(current._1, current._2) +: withoutCurrentJunction)
     else
       if withCurrentJunction.exists(circuit => circuit.contains(current._1) && circuit.contains(current._2)) then
         part1(jbDistances.tail, remaining - 1, circuits)
       else
-        ???
+        val merged = withCurrentJunction.head ++ withCurrentJunction.last
+        part1(jbDistances.tail, remaining - 1, merged +: withoutCurrentJunction)
+        
 
 
 case class JunctionBox(x: Int, y: Int, z: Int):
