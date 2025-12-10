@@ -1,7 +1,10 @@
+import scala.annotation.tailrec
+import scala.collection.mutable
+
 object Solution:
   def run(inputLines: Seq[String]): (String, String) =
 
-    val result =
+    val machines =
       inputLines.map: line =>
         val (machineO, boutons, voltages) = line.split(" ").foldLeft((Option.empty[Machine], Seq.empty[Bouton], Seq.empty[Voltage])):
           case ((machineA, boutonsA, voltagesA), MachineExt(machine)) => (Some(machine), boutonsA, voltagesA)
@@ -14,21 +17,34 @@ object Solution:
           case None => throw Exception("not supported")
 
 
-    //
-    // Code is here
-    //
+    val result1 =
+      machines.map:
+        case (machine, boutons, _) => loop(machine.target, boutons)
+      .sum
 
 
-
-    val result1 = s""
     val result2 = s""
 
     (result1.toString, result2.toString)
 
 end Solution
 
+@tailrec
+def loop(target: Int, boutons: Seq[Bouton], values: mutable.BitSet = mutable.BitSet(0), iteration: Int = 0): Int =
+  if values.contains(target) then
+    iteration
+  else
+    val results = values.toSeq.flatMap: value =>
+      boutons.map(_.xor(value))
+    loop(target, boutons, mutable.BitSet(results:_*), iteration + 1)
+
 case class Machine(target: Int)
-case class Bouton(values: Seq[Int])
+case class Bouton(values: Seq[Int]):
+  val internalValue: Int = values.map(math.pow(2, _)).sum.toInt
+  def xor(other: Int): Int = internalValue ^ other
+
+  override def toString: String = super.toString + s" => ($internalValue)"
+
 case class Voltage(values: Seq[Int])
 
 object VoltageExt:
@@ -47,7 +63,7 @@ object MachineExt:
   def unapply(str: String): Option[Machine] =
     str match
       case s"[$values]" =>
-        val finalValue = values.foldLeft(0):
+        val finalValue = values.reverse.foldLeft(0):
           case (acc, '.') => acc * 2
           case (acc, '#') => acc * 2 + 1
         Some(Machine(finalValue))
