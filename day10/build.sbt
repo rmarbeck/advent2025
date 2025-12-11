@@ -15,6 +15,7 @@ lazy val adventday10 = (project in file(".")).
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.6",
       "ch.qos.logback" % "logback-classic" % "1.5.19",
       "org.scala-lang.modules" %% "scala-parallel-collections" % "1.2.0",
+      "com.google.ortools" % "ortools-java" % "9.14.6206",
       "org.scalameta" %% "munit" % "1.2.0" % Test
     )
   )
