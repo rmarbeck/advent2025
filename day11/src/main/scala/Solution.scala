@@ -4,13 +4,13 @@ import scala.collection.mutable
 object Solution:
   def run(inputLines: Seq[String]): (String, String) =
 
-    val devices = inputLines.foldLeft(Map.empty[Device, Seq[Device]]):
+    val nextDevices = inputLines.foldLeft(Map.empty[Device, Seq[Device]]):
       case (acc, s"$src: $destinations") =>
         val dest = destinations.split(" ").map(Device.apply).toSeq
         acc + (Device(src) -> dest)
       case _ => throw Exception("not supported")
 
-    given devicesWithOut: Map[Device, Seq[Device]] = devices + (Device("out") -> Seq.empty[Device])
+    given nextDevicesWithOut: Map[Device, Seq[Device]] = nextDevices + (Device("out") -> Seq.empty[Device])
 
     val firstPath = countPaths(Device("svr"), Device("fft"))
     val secondPath = countPaths(Device("fft"), Device("dac"))
@@ -24,13 +24,13 @@ object Solution:
 end Solution
 
 def countPaths( start: Device,
-                target: Device)(using devices: Map[Device, Seq[Device]]): Long =
+                target: Device)(using nextDevices: Map[Device, Seq[Device]]): Long =
   val memo = collection.mutable.Map.empty[Device, Long]
 
-  def loop(u: Device): Long =
-    memo.getOrElseUpdate(u,
-      if u == target then 1L
-      else devices(u).map(loop).sum
+  def loop(d: Device): Long =
+    memo.getOrElseUpdate(d,
+      if d == target then 1L
+      else nextDevices(d).map(loop).sum
     )
 
   loop(start)
